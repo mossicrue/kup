@@ -1,0 +1,42 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: kup
+  namespace: kup-backup
+spec:
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: kup
+        spec:
+          serviceAccount: kup-user
+          containers:
+          - image: docker.io/mossicrue/kup:${KUP_RENDER_OPENSHIFT_VERSION}
+            imagePullPolicy: IfNotPresent
+            name: kup
+            volumeMounts:
+            - mountPath: /tmp/kup-cluster-ssh-key
+              name: kup-cluster-ssh-key-mount
+              subPath: kup-cluster-ssh-key
+            - mountPath: /mnt/kup-backup/
+              name: kup-backup-pvc-mount
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: kup-cluster-ssh-key-mount
+            secret:
+              defaultMode: 256
+              secretName: kup-cluster-node-ssh-key
+          - name: kup-backup-pvc-mount
+            persistentVolumeClaim:
+              claimName: kup-backup-pvc
+  schedule: ${KUP_RENDER_CRONTAB_TIME}
+  successfulJobsHistoryLimit: ${KUP_RENDER_SUCCESS_JOB_HISTORY}
+  failedJobsHistoryLimit: ${KUP_RENDER_FAILURE_JOB_HISTORY}
+  suspend: false

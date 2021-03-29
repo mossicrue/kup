@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kup-view-nodes-rolebind
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kup-backup-view-nodes
+subjects:
+- kind: ServiceAccount
+  name: kup-user
+  namespace: kup-backup

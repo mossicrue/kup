@@ -1,0 +1,8 @@
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  annotations:
+    openshift.io/description: Kup etcd backup solution project
+    openshift.io/display-name: kup-backup
+  name: kup-backup
+spec: {}

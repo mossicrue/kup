@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kup-config
+  namespace: kup-backup
+data:
+  KUP_RETENTION_DAYS: '${KUP_RENDER_RETENTION_DAYS}'

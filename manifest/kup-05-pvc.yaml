@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kup-backup-pvc
+  namespace: kup-backup
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: ${KUP_RENDER_PERSISTENT_VOLUME_SIZE}
+  volumeMode: Filesystem
+  volumeName: ${KUP_RENDER_PERSISTENT_VOLUME_NAME}
