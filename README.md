@@ -2,7 +2,7 @@
 Make Openshift 4.x cluster backup easy as drink a Kup of a coffee
 
 ## How it works?
-Kup takes the backup of an Openshift cluster by archiving both ETCD backup and static pod backup.
+Kup takes the backup of an Openshift cluster by archiving both ETCD and static pod backup.
 
 The Kup backup process can be simplified in this step:
 
