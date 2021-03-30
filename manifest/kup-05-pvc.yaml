@@ -5,7 +5,7 @@ metadata:
   namespace: kup-backup
 spec:
   accessModes:
-  - ReadWriteMany
+  - ${KUP_RENDER_PERSISTENT_VOLUME_ACCESS_MODE}
   resources:
     requests:
       storage: ${KUP_RENDER_PERSISTENT_VOLUME_SIZE}
