@@ -1,16 +1,17 @@
 # KUP - Automated Cluster Backup for Openshift
 Make Openshift 4.x cluster backup easy as drink a Kup of a coffee
+NOTE: This is the 2.0 version of Kup, now it no longer requires to add ssh-key to master nodes.
 
 ## How it works?
 Kup takes the backup of an Openshift cluster by archiving both ETCD and static pod backup.
 
 The Kup backup process can be simplified in this step:
 
-1. Log on the openshift cluster and check master node health
+1. The cronjob will schedule a pod on a master node
 
-2. Run the `/usr/local/bin/cluster-backup.sh` script on a master node
+2. Run the `/usr/local/bin/cluster-backup.sh` script
 
-3. Copy the archive output on a persistent volume
+3. Copy the archive output on a persistent volume specified on the cronjob
 
 ### Repository Content
 The Repository is formed by this elements:
@@ -49,11 +50,6 @@ spec:
 
 More infos about provisioning persistent storage are present in the [Persistent Storage pages](https://docs.openshift.com/container-platform/4.5/storage/understanding-persistent-storage.html) of the Openshift docs with all the compatible type of volume in the "Configuring Persistent Volume" section
 
-### Retrieve the ssh key to access the cluster as the core user
-Kup need to use the cluster ssh key created during the installation process in order to access the master node and run the Openshift cluster backup script.  
-
->**Note:** If you want to add an ad-hoc key you can follow this [RedHat Solutions](https://access.redhat.com/solutions/3868301)
-
 ### Set Kup values
 Once both persistent volume and cluster ssh key are ready, it's possible to render the Kup manifests by first editing the `kup-values.conf` and then running the `kup-render.sh` script.
 
@@ -64,21 +60,19 @@ The `kup-values.conf` file has 2 type of values:
 - **optional**: have a default value that can be changed with something else to customize the default Kup behavior
 
 
-Mandatory values are 3, and they are:
-
-- `KUP_RENDER_CLUSTER_SSH_KEY_PATH`: path to the openshift cluster ssh key
+Mandatory values are 2, and they are:
 
 - `KUP_RENDER_PERSISTENT_VOLUME_NAME`: name of the persistent volume created before
 
 - `KUP_RENDER_OPENSHIFT_VERSION`: version of the cluster, value can be in the format of `4.x` or `v4.x`
 
-To easily retrieve the Openshift version run this command in the bastion host:
-```bash
-[mossicrue@bastion]$ oc version | grep "^Server"
-Server Version: 4.5.8
-```
+If, for example, you have a cluster running with Openshift version `4.5.8`, the correct version of Kup will be `v4.5` or `4.5`
 
-The value returned is `4.5.8`, for Kup is necessary only necessary the first 2 digit, so the version to use will be `v4.5` or `4.5`
+To easily retrieve the Openshift version string to paste in the `kup-values.conf` run this command on the bastion host:
+```bash
+[mossicrue@bastion]$ oc version | grep "^Server Version:" | cut -d " " -f 3 | awk -F "." '{print "v"$1"."$2}'
+v4.5
+```
 
 ### Render the manifests
 After editing all the values in the kup-values.conf it's possible to render the manifest by running the `kup-render.sh` script.
@@ -105,4 +99,4 @@ Once the `kup-install.yaml` file is generated you can copy it to your bastion se
 [mossicrue@bastion]$ oc apply -f kup-install.yaml
 ```
 
-It will create all the objects needed for Kup in its project called kup-backup.
+It will create all the objects needed for Kup in the `kup-backup` project/namespace.
