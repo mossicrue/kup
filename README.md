@@ -1,17 +1,31 @@
 # KUP - Automated Cluster Backup for Openshift
 Make Openshift 4.x cluster backup easy as drink a Kup of a coffee
-NOTE: This is the 2.0 version of Kup, now it no longer requires to add ssh-key to master nodes.
 
-## How it works?
+## Table of Contents
+
+- [Notes](#Notes)
+- [How it Works?](#How-it-Works)
+- [Installation](#Installation)
+- [Upgrading from Kup 1.0](#Upgrading-from-Kup-1.0)
+
+## Notes
+This is the 2.0 version of Kup, now it no longer requires to add ssh-key to master nodes.  
+As I mainly re-wrote the script and the openshift manifests to make the script less "strictive" I highly recommend to switch at the new version where the pod use node-exporter capabilities to connect into the master nodes and run the backup script.  
+To update kup to the new version delete the running `kup-backup` project from the cluster and follow the "Upgrade" guides below
+The previous version of the images will be still available but tagged as `xxx_old_notuse`.  
+
+## How it Works
 Kup takes the backup of an Openshift cluster by archiving both ETCD and static pod backup.
 
 The Kup backup process can be simplified in this step:
 
 1. The cronjob will schedule a pod on a master node
 
-2. Run the `/usr/local/bin/cluster-backup.sh` script
+2. Check the cluster health and "tag" the results in the backup
 
-3. Copy the archive output on a persistent volume specified on the cronjob
+3. Run the `/usr/local/bin/cluster-backup.sh` script
+
+4. Copy the archive output on a persistent volume specified on the cronjob
 
 ### Repository Content
 The Repository is formed by this elements:
@@ -22,7 +36,7 @@ The Repository is formed by this elements:
 
 - `kup-render.sh`: script that will render the manifest with the kup-values to create the kup-install.yaml
 
-## Kup Installation
+## Installation
 
 Before starting to render the templates and install the final yaml, it's necessary to create a persistent volume and retrieve the cluster ssh key to access the nodes.
 
@@ -60,7 +74,7 @@ The `kup-values.conf` file has 2 type of values:
 - **optional**: have a default value that can be changed with something else to customize the default Kup behavior
 
 
-Mandatory values are 2, and they are:
+Mandatory values are:
 
 - `KUP_RENDER_PERSISTENT_VOLUME_NAME`: name of the persistent volume created before
 
@@ -100,3 +114,16 @@ Once the `kup-install.yaml` file is generated you can copy it to your bastion se
 ```
 
 It will create all the objects needed for Kup in the `kup-backup` project/namespace.
+
+
+### Cluster status tag
+If the kup-backup service account that run the cronjob has necessary priviliges, the job can also check the health of the cluster and tag the backup with the result of some checks.  
+
+
+| Health Tag   | Meaning                                                                       |
+|--------------|-------------------------------------------------------------------------------|
+| sick-masters | one or more master nodes are in "Not Ready" status                            |
+| sick-workers | one or more not-master nodes (worker, infra, ecc) are in "Not Ready" status   |
+| sick-cluster | one or more master nodes and one or more not-master are in "Not Ready" status |
+
+## Upgrading from Kup 1.0
