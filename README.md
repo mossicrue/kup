@@ -3,10 +3,10 @@ Make Openshift 4.x cluster backup easy as drink a Kup of a coffee
 
 ## Table of Contents
 
-- [Notes](#Notes)
-- [How it Works?](#How-it-Works)
-- [Installation](#Installation)
-- [Upgrading from Kup 1.0](#Upgrading-from-Kup-1.0)
+- [Notes](#notes)
+- [How it Works?](#how-it-works)
+- [Installation](#installation)
+- [Upgrading from Kup 1.0](#upgrading-from-Kup-10)
 
 ## Notes
 This is the 2.0 version of Kup, now it no longer requires to add ssh-key to master nodes.  
