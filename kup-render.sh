@@ -12,7 +12,7 @@ KUP_INSTALL_PATH="kup-install.yaml"
 kup_usage() {
   cat << EOF
 
-Kup - Automated ETCD Backup for Openshift
+Kup - Automated ETCD Cluster Backup for Openshift
 
 Usage: kup-render.sh -f <file> [-m <path>]
 
@@ -69,6 +69,7 @@ then
   echo -e "ERROR: no manifest seems to be present in the $KUP_MANIFESTS_PATH"
 fi
 
+# import all the variables from the kup-values.conf file
 source $KUP_VALUES_PATH
 
 # check if ssh key exists and get its content

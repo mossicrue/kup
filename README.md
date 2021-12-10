@@ -7,6 +7,7 @@ Make Openshift 4.x cluster backup easy as drink a Kup of a coffee
 - [How it Works?](#how-it-works)
 - [Installation](#installation)
 - [Upgrading from Kup 1.0](#upgrading-from-Kup-10)
+- [Uninstallation](#uninstallation)
 
 ## Notes
 This is the 2.0 version of Kup, now it no longer requires to add ssh-key to master nodes.  
@@ -50,7 +51,7 @@ If you need a manifest to create the persistent volume you can use the one below
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv0001
+  name: kup-backup-pv
 spec:
   capacity:
     storage: 10Gi
@@ -127,3 +128,12 @@ If the kup-backup service account that run the cronjob has necessary priviliges,
 | sick-cluster | one or more master nodes and one or more not-master are in "Not Ready" status |
 
 ## Upgrading from Kup 1.0
+
+If you have previously installed the old version of Kup follow this guides to upgrade your Kup version to the new one, just uninstallation guide and follow the installation guide.
+
+## Uninstallation
+
+To uninstall Kup from your cluster follow this steps:
+- Release the persistent-volume claim from the `kup-backup` project
+- Delete the `kup-backup` project from the cluster
+- Delete the `kup-backup-pv` persistent volume from the cluster
