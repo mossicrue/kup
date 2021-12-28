@@ -14,11 +14,11 @@ kup_usage() {
 
 Kup - Automated ETCD Cluster Backup for Openshift
 
-Usage: kup-render.sh -f <file> [-m <path>]
+Usage: kup-render.sh [-f <file>] [-m <path>]
 
 Options:
--f <file>  - path to Kup "values" file where store configuration data, optional
--m <path>  - path to the directory with all the manifest to render, default is ./manifest
+-f FILE    path to Kup "values" file where store configuration data, default: kup-values.conf
+-m PATH    path to the directory with all the manifest to render, default: ./manifest
 
 See more at https://github.com/mossicrue/kup
 
@@ -72,14 +72,14 @@ fi
 # import all the variables from the kup-values.conf file
 source $KUP_VALUES_PATH
 
-# check if ssh key exists and get its content
-if [[ ! -f "$KUP_RENDER_CLUSTER_SSH_KEY_PATH" ]]
-then
-  echo -e "ERROR: ssh key $KUP_RENDER_CLUSTER_SSH_KEY_PATH not found. Exiting"
-  exit 20
-fi
-# make it base64 and save in KUP_RENDER_CLUSTER_SSH_KEY
-KUP_RENDER_CLUSTER_SSH_KEY=$(cat $KUP_RENDER_CLUSTER_SSH_KEY_PATH | base64 -w 0 2>/dev/null)
+### # check if ssh key exists and get its content
+### if [[ ! -f "$KUP_RENDER_CLUSTER_SSH_KEY_PATH" ]]
+### then
+###   echo -e "ERROR: ssh key $KUP_RENDER_CLUSTER_SSH_KEY_PATH not found. Exiting"
+###   exit 20
+### fi
+### # make it base64 and save in KUP_RENDER_CLUSTER_SSH_KEY
+### KUP_RENDER_CLUSTER_SSH_KEY=$(cat $KUP_RENDER_CLUSTER_SSH_KEY_PATH | base64 -w 0 2>/dev/null)
 
 # clean kup-install file
 echo "" > $KUP_INSTALL_PATH
