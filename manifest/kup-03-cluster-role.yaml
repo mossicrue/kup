@@ -4,7 +4,7 @@ metadata:
   name: kup-backup-view-nodes
 rules:
 - apiGroups:
-  - ""
+  - ''
   resources:
   - nodes
   verbs:

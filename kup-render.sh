@@ -5,20 +5,23 @@
 
 # VARIABLES
 # KUP_VALUES_PATH: path to the kup "values" file where all the configuration is stored
+# KUP_MANIFEST_PATH: path to the kup "manifest" directory containing all the manifests
+# KUP_INSTALL_PATH: path to the all-in-one installation manifest file
 KUP_VALUES_PATH="kup-values.conf"
 KUP_MANIFESTS_PATH="manifest"
 KUP_INSTALL_PATH="kup-install.yaml"
 
+# Function that print the usage of the script when issued with the -h option
 kup_usage() {
   cat << EOF
 
-Kup - Automated ETCD Backup for Openshift
+Kup - Automated ETCD Cluster Backup for Openshift
 
-Usage: kup-render.sh -f <file> [-m <path>]
+Usage: kup-render.sh [-f <file>] [-m <path>]
 
 Options:
--f <file>  - path to Kup "values" file where store configuration data, optional
--m <path>  - path to the directory with all the manifest to render, default is ./manifest
+-f FILE    path to Kup "values" file, default is kup-values.conf
+-m PATH    path to the directory with the manifest to render, default is ./manifest
 
 See more at https://github.com/mossicrue/kup
 
@@ -55,52 +58,45 @@ then
   exit 10
 fi
 
-# check if manifest directory exist
+# Check if manifest directory exist
 if [[ ! -d "$KUP_MANIFESTS_PATH" ]]
 then
   echo -n "ERROR: Path $KUP_MANIFESTS_PATH not found. Exiting"
   exit 11
 fi
 
-# check if manifests are present
+# Check if manifests are present
 MANIFEST_NUMBER=$(ls -1 $KUP_MANIFESTS_PATH | wc -l)
 if [[ $MANIFEST_NUMBER -eq 0 ]]
 then
   echo -e "ERROR: no manifest seems to be present in the $KUP_MANIFESTS_PATH"
 fi
 
+# Import all the variables from the kup-values.conf file
 source $KUP_VALUES_PATH
 
-# check if ssh key exists and get its content
-if [[ ! -f "$KUP_RENDER_CLUSTER_SSH_KEY_PATH" ]]
-then
-  echo -e "ERROR: ssh key $KUP_RENDER_CLUSTER_SSH_KEY_PATH not found. Exiting"
-  exit 20
-fi
-# make it base64 and save in KUP_RENDER_CLUSTER_SSH_KEY
-KUP_RENDER_CLUSTER_SSH_KEY=$(cat $KUP_RENDER_CLUSTER_SSH_KEY_PATH | base64 -w 0 2>/dev/null)
-
-# clean kup-install file
+# Clean kup-install file
 echo "" > $KUP_INSTALL_PATH
 
-# loop all the manifest and render values in ./kup-install.yaml
+# Loop all the manifest and render values in ./kup-install.yaml
 for KUP_MANIFEST in ${KUP_MANIFESTS_PATH}/*
 do
   echo -e "INFO: Rendering manifest $KUP_MANIFEST"
-  # check that the manifest isn't empty
+  # Check that the manifest isn't empty
   if [[ ! -s "$KUP_MANIFEST" ]]
   then
     echo -e "WARNING: $KUP_MANIFEST is empty. Is it ok?"
     continue
   fi
-  # load manifest content
+  # Load manifest content
   KUP_MANIFEST_CONTENT=$(cat $KUP_MANIFEST 2>/dev/null)
-  # add yaml separator
+  # Add yaml separator
   echo "---" >> $KUP_INSTALL_PATH
-  # render the value in the installation file
+  # Render the value in the installation file
   eval "echo -e \"$KUP_MANIFEST_CONTENT\"" >> $KUP_INSTALL_PATH
 done
-# output how to do the things
+
+# Print final steps
 echo -e "\nKup is ready to install on your cluster:"
-echo -e "  - Copy $KUP_INSTALL_PATH manifest on your bastion host"
-echo -e "  - Run: oc apply -f $KUP_INSTALL_PATH\n"
+echo -e "  1. Copy $KUP_INSTALL_PATH manifest on your bastion host"
+echo -e "  2. Run: oc apply -f $KUP_INSTALL_PATH\n"

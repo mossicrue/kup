@@ -13,29 +13,34 @@ spec:
             app: kup
         spec:
           serviceAccount: kup-user
+          nodeSelector:
+            node-role.kubernetes.io/master: ''
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+              effect: NoSchedule
           containers:
           - image: docker.io/mossicrue/kup:${KUP_RENDER_OPENSHIFT_VERSION}
             imagePullPolicy: IfNotPresent
             name: kup
+            securityContext:
+              privileged: true
+              runAsUser: 0
             volumeMounts:
-            - mountPath: /tmp/kup-cluster-ssh-key
-              name: kup-cluster-ssh-key-mount
-              subPath: kup-cluster-ssh-key
             - mountPath: /mnt/kup-backup/
               name: kup-backup-pvc-mount
+            - mountPath: /mnt/node
+              name: kup-node-mount
           dnsPolicy: ClusterFirst
           restartPolicy: OnFailure
           schedulerName: default-scheduler
           securityContext: {}
           terminationGracePeriodSeconds: 30
           volumes:
-          - name: kup-cluster-ssh-key-mount
-            secret:
-              defaultMode: 256
-              secretName: kup-cluster-node-ssh-key
           - name: kup-backup-pvc-mount
             persistentVolumeClaim:
               claimName: kup-backup-pvc
+          - name: kup-node-mount
   schedule: ${KUP_RENDER_CRONTAB_TIME}
   successfulJobsHistoryLimit: ${KUP_RENDER_SUCCESS_JOB_HISTORY}
   failedJobsHistoryLimit: ${KUP_RENDER_FAILURE_JOB_HISTORY}
