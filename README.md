@@ -83,7 +83,7 @@ Mandatory values are:
 
 If, for example, you have a cluster running with Openshift version `4.5.8`, the correct version of Kup will be `v4.5` or `4.5`
 
-To easily retrieve the Openshift version string to paste in the `kup-values.conf` run this command on the bastion host:
+To easily retrieve the Openshift version string to paste in the `kup-values.conf` run the `oc version` command or this snippet on the bastion host:
 ```bash
 [mossicrue@bastion]$ oc version | grep "^Server Version:" | cut -d " " -f 3 | awk -F "." '{print "v"$1"."$2}'
 v4.5
@@ -92,11 +92,11 @@ v4.5
 ### Render the manifests
 After editing all the values in the kup-values.conf it's possible to render the manifest by running the `kup-render.sh` script.
 
-The script, as for its usage, has 2 options:
+The script, as for its usage, has 2 optional arguments:
 
-- `-f`: path to the file with the kup-values file.
+- `-f FILE`: path to Kup "values" file, default is kup-values.conf
 
-- `-m`: optional, is the path to the directory with Kup's manifests.
+- `-m PATH`: path to the directory with the manifest to render, default is ./manifest
 
 A simple command to run for render the manifest can be
 
@@ -114,7 +114,7 @@ Once the `kup-install.yaml` file is generated you can copy it to your bastion se
 [mossicrue@bastion]$ oc apply -f kup-install.yaml
 ```
 
-It will create all the objects needed for Kup in the `kup-backup` project/namespace.
+It will create the necessary objects in the `kup-backup` project/namespace.
 
 
 ### Cluster status tag
@@ -129,7 +129,9 @@ If the kup-backup service account that run the cronjob has necessary priviliges,
 
 ## Upgrading from Kup 1.0
 
-If you have previously installed the old version of Kup follow this guides to upgrade your Kup version to the new one, just uninstallation guide and follow the installation guide.
+If you have previously installed the old version of Kup follow these steps to upgrade Kup to the latest version:
+- Uninstall Kup from the cluster following the [Uninstallation](#uninstallation) section
+- Fresh install Kup with the current version following the [Installation](#installation) section
 
 ## Uninstallation
 

@@ -20,8 +20,8 @@ Kup - Automated ETCD Cluster Backup for Openshift
 Usage: kup-render.sh [-f <file>] [-m <path>]
 
 Options:
--f FILE    path to Kup "values" file where store configuration data, default: kup-values.conf
--m PATH    path to the directory with all the manifest to render, default: ./manifest
+-f FILE    path to Kup "values" file, default is kup-values.conf
+-m PATH    path to the directory with the manifest to render, default is ./manifest
 
 See more at https://github.com/mossicrue/kup
 
